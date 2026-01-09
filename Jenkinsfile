@@ -1,49 +1,47 @@
 pipeline {
     agent {
         docker { 
-            image 'python:3.9-slim' 
-            args '-u -p 3000:3000' // Arguments needed for docker to run smoothly
+            image 'python:3.12'
         }
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
-                // Jenkins automatically checks out the code from SCM (GitHub)
                 echo 'Checking out code from GitHub...'
-                sh 'ls -la' // Verifies the files are there
+                sh 'ls -la'
             }
         }
-
+        
         stage('Build & Test') {
             steps {
                 echo 'Running Python Application...'
-                // Requirement: "test et exécute votre application"
                 sh 'python app.py' 
             }
         }
-
+        
         stage('Archive') {
             steps {
                 echo 'Archiving artifacts...'
-                // Requirement: "archiver votre projet"
                 archiveArtifacts artifacts: 'app.py, README.md', fingerprint: true
             }
         }
     }
-
+    
     post {
         always {
             echo 'Pipeline finished.'
         }
         success {
-             // Requirement: "Notify Slack"
-             // Note: You need the Slack plugin installed in Jenkins for this to work
-             // slackSend channel: '#devops', message: "Succès du Pipeline: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-             echo 'Slack notification would be sent here (Plugin required)'
+            script {
+                def slackUrl = 'https://hooks.slack.com/services/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' 
+                def message = "✅ Succès du Build: ${env.JOB_NAME} #${env.BUILD_NUMBER}\nVoir: ${env.BUILD_URL}"
+                
+                sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"${message}\"}' ${slackUrl}"
+            }
         }
         failure {
-             echo 'Pipeline failed.'
+            echo 'Pipeline failed.'
         }
     }
 }
