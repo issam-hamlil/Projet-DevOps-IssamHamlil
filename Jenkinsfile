@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker { 
-            image 'python:3.9-slim' 
+            image 'python:3.12' 
             args '-u -p 3000:3000' // Arguments needed for docker to run smoothly
         }
     }
