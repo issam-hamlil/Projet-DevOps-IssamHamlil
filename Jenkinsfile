@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker { 
+<<<<<<< HEAD
             image 'python:3.12'
         }
     }
